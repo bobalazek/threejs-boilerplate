@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { WEBGL } from 'three/examples/jsm/WebGL.js';
 import {
   Emitter,
   createNanoEvents,
@@ -40,6 +41,12 @@ export default class Application {
   public static boot(config: ApplicationConfigInterface, parameters?: any): Application {
     this.config = config;
     this.parameters = parameters;
+
+    if (!WEBGL.isWebGLAvailable()) {
+      this.prepareNoWebGLWarning();
+
+      return;
+    }
 
     this.prepareGeneral();
     this.prepareRenderer();
@@ -90,6 +97,18 @@ export default class Application {
 
   private static prepareWorld() {
     this.world = new World();
+  }
+
+  private static prepareNoWebGLWarning() {
+    let warning = document.createElement('div');
+    warning.style.textAlign = 'center';
+    warning.style.background = '#ffffff';
+    warning.style.color = '#000000';
+    warning.style.fontSize = '18px';
+    warning.style.padding = '20px';
+    warning.innerHTML = 'Sorry, but it seems that your browser does not support WebGL. Try again with another browser!'
+
+    document.body.prepend(warning);
   }
 
   // Events

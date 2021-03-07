@@ -26,21 +26,25 @@ export default class Loader {
     this.gltfLoader = new GLTFLoader();
   }
 
-  public loadBatch(resources: string[], onProgress?: (loaderResource: LoaderResource) => void): Promise<LoaderResource[]> {
-    let promises: Promise<LoaderResource|null>[] = [];
+  public loadBatch(resources: string[], onProgress?: (loaderResource: LoaderResource) => void): Promise<LoaderResources> {
+    return new Promise((resolve) => {
+      let promises: Promise<LoaderResource|null>[] = [];
 
-    resources.forEach((resource) => {
-      const loaderResourcePromise = this.load(resource);
-      promises.push(loaderResourcePromise);
+      resources.forEach((resource) => {
+        const loaderResourcePromise = this.load(resource);
+        promises.push(loaderResourcePromise);
 
-      if (onProgress) {
-        loaderResourcePromise.then((loaderResource) => {
-          onProgress(loaderResource);
-        });
-      }
+        if (onProgress) {
+          loaderResourcePromise.then((loaderResource) => {
+            onProgress(loaderResource);
+          });
+        }
+      });
+
+      return Promise.all(promises).then(() => {
+        return resolve(this.resources);
+      });
     });
-
-    return Promise.all(promises);
   }
 
   public load(resource: string, onProgress?: (loaderResource: LoaderResource) => void): Promise<LoaderResource|null> {
@@ -52,12 +56,12 @@ export default class Loader {
       const ext = resource.split('.').pop();
 
       if (['jpg', 'png', 'gif'].includes(ext)) {
-        return this.loadImage(resource, onProgress).then(() => {
-          return resolve(this.resources[resource]);
+        return this.loadImage(resource, onProgress).then((loaderResource) => {
+          return resolve(loaderResource);
         });
       } else if (['gltf', 'glb'].includes(ext)) {
-        return this.loadGltf(resource, onProgress).then(() => {
-          return resolve(this.resources[resource]);
+        return this.loadGltf(resource, onProgress).then((loaderResource) => {
+          return resolve(loaderResource);
         })
       }
 
@@ -65,9 +69,29 @@ export default class Loader {
     });
   }
 
+  public getStatus() {
+    const resources = Object.values(this.resources);
+
+    const total = resources.length;
+    const loaded = resources.filter((resource) => {
+      return resource.isLoaded;
+    }).length;
+    const loading = resources.filter((resource) => {
+      return resource.isLoading;
+    }).length;
+
+    return {
+      total,
+      loaded,
+      loading,
+    };
+  }
+
   private loadGltf(resource: string, onProgress?: (loaderResource: LoaderResource) => void): Promise<LoaderResource> {
     return new Promise((resolve) => {
       let loaderResource = new LoaderResource(resource);
+
+      this.resources[resource] = loaderResource;
 
       this.gltfLoader.load(
         resource,
@@ -88,6 +112,7 @@ export default class Loader {
         },
         (error) => {
           loaderResource.error = error;
+          loaderResource.isLoaded = true;
 
           resolve(loaderResource);
         }
@@ -98,6 +123,8 @@ export default class Loader {
   private loadImage(resource: string, onProgress?: (loaderResource: LoaderResource) => void): Promise<LoaderResource> {
     return new Promise((resolve) => {
       let loaderResource = new LoaderResource(resource);
+
+      this.resources[resource] = loaderResource;
 
       const image = new Image();
       image.src = resource;
@@ -118,6 +145,7 @@ export default class Loader {
       });
       image.addEventListener('error', (error) => {
         loaderResource.error = error;
+        loaderResource.isLoaded = true;
 
         resolve(loaderResource);
       });

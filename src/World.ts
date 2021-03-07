@@ -4,7 +4,7 @@ import cybertruckResource from './Resources/models/cybertruck.glb';
 
 export default class World {
   constructor() {
-    // TODO
+    Application.preloader.show();
 
     const resources = [
       cybertruckResource,
@@ -12,6 +12,8 @@ export default class World {
 
     Application.loader.loadBatch(resources).then(() => {
       console.log('All resources loaded!');
+
+      Application.preloader.hide();
     });
   }
 }

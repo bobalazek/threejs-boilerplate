@@ -6,6 +6,7 @@ import {
 } from 'nanoevents';
 
 import Loader from './Loader';
+import Preloader from './Preloader';
 import World from './World';
 
 interface ApplicationConfigInterface {
@@ -26,6 +27,8 @@ export default class Application {
   public static debug: boolean;
   public static emitter: Emitter;
   public static loader: Loader;
+  public static preloader: Preloader;
+  public static world: World;
 
   public static width: number;
   public static height: number;
@@ -35,8 +38,6 @@ export default class Application {
   public static scene: THREE.Scene;
   public static camera: THREE.PerspectiveCamera;
   public static clock: THREE.Clock;
-
-  public static world: World;
 
   public static boot(config: ApplicationConfigInterface, parameters?: any): Application {
     this.config = config;
@@ -51,17 +52,18 @@ export default class Application {
     this.prepareGeneral();
     this.prepareRenderer();
     this.prepareEvents();
-    this.prepareWorld();
 
     return this;
   }
 
-  // Prepare data
+  // Prepare stuff
   private static prepareGeneral() {
     this.canvasElement = this.config.canvasElement;
     this.debug = this.config.debug ?? false;
     this.emitter = createNanoEvents<ApplicationEvents>();
     this.loader = new Loader();
+    this.preloader = new Preloader();
+    this.world = new World();
   }
 
   private static prepareRenderer() {
@@ -95,20 +97,20 @@ export default class Application {
     this.renderer.setSize(this.width, this.height);
   }
 
-  private static prepareWorld() {
-    this.world = new World();
-  }
-
   private static prepareNoWebGLWarning() {
-    let warning = document.createElement('div');
-    warning.style.textAlign = 'center';
-    warning.style.background = '#ffffff';
-    warning.style.color = '#000000';
-    warning.style.fontSize = '18px';
-    warning.style.padding = '20px';
-    warning.innerHTML = 'Sorry, but it seems that your browser does not support WebGL. Try again with another browser!'
+    let warningElement = document.createElement('div');
+    warningElement.id = 'no-webgl-warning';
+    warningElement.style.textAlign = 'center';
+    warningElement.style.background = '#ffffff';
+    warningElement.style.color = '#000000';
+    warningElement.style.fontSize = '18px';
+    warningElement.style.padding = '20px';
+    warningElement.innerHTML = (
+      'Sorry, but it seems that your browser does not support WebGL. ' +
+      'Try again with another browser!'
+    );
 
-    document.body.prepend(warning);
+    document.body.prepend(warningElement);
   }
 
   // Events

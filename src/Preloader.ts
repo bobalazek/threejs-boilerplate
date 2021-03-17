@@ -14,6 +14,8 @@ export default class Preloader {
     const onProgress = (url, loaded, total) => {
       this.loaded = loaded;
       this.total = total;
+
+      this.updateProgress();
     };
 
     Application.loadingManager.onStart = onProgress;
@@ -63,9 +65,6 @@ export default class Preloader {
 
   public show() {
     this.updateProgress();
-    this.interval = window.setInterval(() => {
-      this.updateProgress();
-    }, 100);
 
     this.containerElement.style.display = 'block';
   }

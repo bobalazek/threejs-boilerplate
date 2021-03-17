@@ -5,7 +5,6 @@ export default class Preloader {
   private textElement: HTMLElement;
   private progressElement: HTMLElement;
   private progressInnerElement: HTMLElement;
-  private interval: number;
 
   private loaded: number = 0;
   private total: number = 1;
@@ -71,8 +70,6 @@ export default class Preloader {
 
   public hide() {
     this.updateProgress();
-
-    window.clearInterval(this.interval);
 
     this.containerElement.style.display = 'none';
   }

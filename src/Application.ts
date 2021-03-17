@@ -5,7 +5,6 @@ import {
   createNanoEvents,
 } from 'nanoevents';
 
-import Loader from './Loader';
 import Preloader from './Preloader';
 import World from './World';
 
@@ -26,7 +25,6 @@ export default class Application {
   public static canvasElement: HTMLCanvasElement;
   public static debug: boolean;
   public static emitter: Emitter;
-  public static loader: Loader;
   public static preloader: Preloader;
   public static world: World;
 
@@ -34,6 +32,7 @@ export default class Application {
   public static height: number;
   public static requestAnimationFrame: number;
 
+  public static loadingManager: THREE.LoadingManager;
   public static renderer: THREE.WebGLRenderer;
   public static scene: THREE.Scene;
   public static camera: THREE.PerspectiveCamera;
@@ -50,7 +49,7 @@ export default class Application {
     }
 
     this.prepareGeneral();
-    this.prepareRenderer();
+    this.prepareThree();
     this.prepareEvents();
 
     return this;
@@ -61,22 +60,24 @@ export default class Application {
     this.canvasElement = this.config.canvasElement;
     this.debug = this.config.debug ?? false;
     this.emitter = createNanoEvents<ApplicationEvents>();
-    this.loader = new Loader();
+    this.loadingManager = new THREE.LoadingManager();
     this.preloader = new Preloader();
-    this.world = new World();
   }
 
-  private static prepareRenderer() {
+  private static prepareThree() {
     this.clock = new THREE.Clock();
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvasElement,
       alpha: true,
     });
     this.renderer.setClearColor(0xffffff, 1);
-    this.prepareRendererSize();
 
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera();
+
+    this.prepareRendererSize();
+
+    this.world = new World();
 
     this.onTick();
   }
@@ -91,7 +92,7 @@ export default class Application {
 
     if (this.camera) {
       this.camera.aspect = this.width / this.height;
-      this.camera.updateProjectionMatrix()
+      this.camera.updateProjectionMatrix();
     }
 
     this.renderer.setSize(this.width, this.height);

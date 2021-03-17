@@ -7,7 +7,16 @@ export default class Preloader {
   private progressInnerElement: HTMLElement;
   private interval: number;
 
+  private loaded: number = 0;
+  private total: number = 1;
+
   constructor() {
+    Application.loadingManager.onStart = (url, loaded, total) => {
+      this.loaded = loaded;
+      this.total = total;
+    };
+
+    // Prepare HTML
     this.containerElement = document.createElement('div');
     this.containerElement.id = 'preloader';
     this.containerElement.style.background = '#000000';
@@ -68,9 +77,9 @@ export default class Preloader {
 
   public updateProgress() {
     const {
-      total,
       loaded,
-    } = Application.loader.getStatus();
+      total,
+    } = this;
 
     this.textElement.innerHTML = 'Loading {loaded}/{total} assets ...'
       .replace('{loaded}', '' + loaded)
@@ -81,7 +90,7 @@ export default class Preloader {
       ? 100
       : (loaded === 0
         ? 0
-        : total / loaded * 100
+        : loaded / total  * 100
       );
     this.progressInnerElement.style.width = percentage + '%';
   }

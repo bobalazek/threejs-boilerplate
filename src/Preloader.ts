@@ -11,10 +11,13 @@ export default class Preloader {
   private total: number = 1;
 
   constructor() {
-    Application.loadingManager.onStart = (url, loaded, total) => {
+    const onProgress = (url, loaded, total) => {
       this.loaded = loaded;
       this.total = total;
     };
+
+    Application.loadingManager.onStart = onProgress;
+    Application.loadingManager.onProgress = onProgress;
 
     // Prepare HTML
     this.containerElement = document.createElement('div');

@@ -48,23 +48,11 @@ export default class Application {
       return;
     }
 
-    this.prepareGeneral();
-    this.prepareThree();
-    this.prepareEvents();
-
-    return this;
-  }
-
-  // Prepare stuff
-  private static prepareGeneral() {
     this.canvasElement = this.config.canvasElement;
     this.debug = this.config.debug ?? false;
     this.emitter = createNanoEvents<ApplicationEvents>();
     this.loadingManager = new THREE.LoadingManager();
     this.preloader = new Preloader();
-  }
-
-  private static prepareThree() {
     this.clock = new THREE.Clock();
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvasElement,
@@ -80,10 +68,10 @@ export default class Application {
     this.world = new World();
 
     this.onTick();
-  }
 
-  private static prepareEvents() {
     window.addEventListener('resize', this.onResize.bind(this));
+
+    return this;
   }
 
   private static prepareRendererSize() {

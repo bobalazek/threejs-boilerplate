@@ -56,7 +56,6 @@ export default class Application {
     this.clock = new THREE.Clock();
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvasElement,
-      alpha: true,
       antialias: true,
       powerPreference: 'high-performance',
     });

@@ -57,6 +57,8 @@ export default class Application {
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvasElement,
       alpha: true,
+      antialias: true,
+      powerPreference: 'high-performance',
     });
     this.renderer.setClearColor(0xffffff, 1);
 

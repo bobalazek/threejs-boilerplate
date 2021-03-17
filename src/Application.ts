@@ -63,7 +63,6 @@ export default class Application {
     this.emitter = createNanoEvents<ApplicationEvents>();
     this.loader = new Loader();
     this.preloader = new Preloader();
-    this.world = new World();
   }
 
   private static prepareRenderer() {
@@ -73,10 +72,13 @@ export default class Application {
       alpha: true,
     });
     this.renderer.setClearColor(0xffffff, 1);
-    this.prepareRendererSize();
 
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera();
+
+    this.prepareRendererSize();
+
+    this.world = new World();
 
     this.onTick();
   }
@@ -91,7 +93,7 @@ export default class Application {
 
     if (this.camera) {
       this.camera.aspect = this.width / this.height;
-      this.camera.updateProjectionMatrix()
+      this.camera.updateProjectionMatrix();
     }
 
     this.renderer.setSize(this.width, this.height);

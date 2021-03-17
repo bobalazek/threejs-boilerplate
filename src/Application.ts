@@ -60,6 +60,9 @@ export default class Application {
       antialias: true,
       powerPreference: 'high-performance',
     });
+    this.renderer.physicallyCorrectLights = true
+    this.renderer.outputEncoding = THREE.sRGBEncoding;
+	  this.renderer.shadowMap.enabled = true;
     this.renderer.setClearColor(0xffffff, 1);
 
     this.scene = new THREE.Scene();

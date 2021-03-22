@@ -62,6 +62,7 @@ export default class Application {
     this.renderer.physicallyCorrectLights = true
     this.renderer.outputEncoding = THREE.sRGBEncoding;
 	  this.renderer.shadowMap.enabled = true;
+    this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setClearColor(0xffffff, 1);
 
     this.scene = new THREE.Scene();

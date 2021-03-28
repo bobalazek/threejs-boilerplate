@@ -9,7 +9,7 @@ import Preloader from './Preloader';
 import World from './World';
 
 interface ApplicationConfigInterface {
-  canvasElement: HTMLCanvasElement;
+  canvasElement?: HTMLCanvasElement;
   debug?: boolean;
 }
 
@@ -54,11 +54,23 @@ export default class Application {
     this.loadingManager = new THREE.LoadingManager();
     this.preloader = new Preloader();
     this.clock = new THREE.Clock();
-    this.renderer = new THREE.WebGLRenderer({
-      canvas: this.canvasElement,
+
+    let rendererParameters = {
       antialias: true,
       powerPreference: 'high-performance',
-    });
+      logarithmicDepthBuffer: true,
+    };
+    if (this.canvasElement) {
+      rendererParameters['canvas'] = this.canvasElement;
+    }
+
+    this.renderer = new THREE.WebGLRenderer(rendererParameters);
+
+    if (!this.canvasElement) {
+      this.canvasElement = this.renderer.domElement;
+      document.body.appendChild(this.canvasElement);
+    }
+    
     this.renderer.physicallyCorrectLights = true
     this.renderer.outputEncoding = THREE.sRGBEncoding;
 	  this.renderer.shadowMap.enabled = true;

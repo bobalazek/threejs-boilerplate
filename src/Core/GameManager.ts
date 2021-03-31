@@ -130,8 +130,6 @@ export default class GameManager {
   }
 
   private static onTick(): void {
-    this.requestAnimationFrame = window.requestAnimationFrame(this.onTick.bind(this));
-
     const delta = this.clock.getDelta();
 
     this.emitter.emit('tick', delta);
@@ -139,5 +137,7 @@ export default class GameManager {
     if (this.scene && this.camera) {
       this.renderer.render(this.scene, this.camera);
     }
+    
+    this.requestAnimationFrame = window.requestAnimationFrame(this.onTick.bind(this));
   }
 }

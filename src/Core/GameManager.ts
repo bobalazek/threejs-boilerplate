@@ -6,20 +6,20 @@ import {
 } from 'nanoevents';
 
 import Preloader from './Preloader';
-import World from './World';
+import World from '../World';
 
-interface ApplicationConfigInterface {
+interface GameManagerConfigInterface {
   canvasElement?: HTMLCanvasElement;
   debug?: boolean;
 }
 
-interface ApplicationEvents {
+interface GameManagerEvents {
   tick: (delta: number) => void;
   resize: (data: { width: number, height: number }) => void;
 }
 
-export default class Application {
-  public static config: ApplicationConfigInterface;
+export default class GameManager {
+  public static config: GameManagerConfigInterface;
   public static parameters: any;
 
   public static canvasElement: HTMLCanvasElement;
@@ -38,7 +38,7 @@ export default class Application {
   public static camera: THREE.PerspectiveCamera;
   public static clock: THREE.Clock;
 
-  public static boot(config: ApplicationConfigInterface, parameters?: any): Application {
+  public static boot(config: GameManagerConfigInterface, parameters?: any): GameManager {
     this.config = config;
     this.parameters = parameters;
 
@@ -50,7 +50,7 @@ export default class Application {
 
     this.canvasElement = this.config.canvasElement;
     this.debug = this.config.debug ?? false;
-    this.emitter = createNanoEvents<ApplicationEvents>();
+    this.emitter = createNanoEvents<GameManagerEvents>();
     this.loadingManager = new THREE.LoadingManager();
     this.preloader = new Preloader();
     this.clock = new THREE.Clock();
@@ -70,7 +70,7 @@ export default class Application {
       this.canvasElement = this.renderer.domElement;
       document.body.appendChild(this.canvasElement);
     }
-    
+
     this.renderer.physicallyCorrectLights = true
     this.renderer.outputEncoding = THREE.sRGBEncoding;
 	  this.renderer.shadowMap.enabled = true;

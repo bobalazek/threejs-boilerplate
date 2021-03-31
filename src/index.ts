@@ -1,10 +1,10 @@
-import Application from './Application';
+import GameManager from './Core/GameManager';
 
 import './Resources/styles/index.scss';
 
 const canvasElement = <HTMLCanvasElement>document.getElementById('canvas');
 
-Application.boot({
+GameManager.boot({
   canvasElement,
   debug: true,
 });

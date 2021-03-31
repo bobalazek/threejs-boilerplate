@@ -1,4 +1,4 @@
-import Application from './Application';
+import GameManager from './GameManager';
 
 export default class Preloader {
   private containerElement: HTMLElement;
@@ -14,28 +14,28 @@ export default class Preloader {
       this.loaded = loaded;
       this.total = total;
 
-      this.updateProgress();
+      this._updateProgress();
     };
 
-    Application.loadingManager.onStart = onProgress;
-    Application.loadingManager.onProgress = onProgress;
+    GameManager.loadingManager.onStart = onProgress;
+    GameManager.loadingManager.onProgress = onProgress;
 
-    this.prepareHtml();
+    this._prepareHtml();
   }
 
   public show() {
-    this.updateProgress();
+    this._updateProgress();
 
     this.containerElement.style.display = 'block';
   }
 
   public hide() {
-    this.updateProgress();
+    this._updateProgress();
 
     this.containerElement.style.display = 'none';
   }
 
-  private prepareHtml() {
+  private _prepareHtml() {
     this.containerElement = document.createElement('div');
     this.containerElement.id = 'preloader';
     this.containerElement.style.background = '#000000';
@@ -77,7 +77,7 @@ export default class Preloader {
     document.body.prepend(this.containerElement);
   }
 
-  private updateProgress() {
+  private _updateProgress() {
     const {
       loaded,
       total,

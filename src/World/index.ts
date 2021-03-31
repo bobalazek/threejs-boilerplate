@@ -1,4 +1,4 @@
-import Application from './Application';
+import GameManager from '../Core/GameManager';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 import cybertruckResource from './Resources/models/cybertruck.glb';
@@ -9,18 +9,18 @@ export default class World {
   }
 
   async prepare() {
-    Application.preloader.show();
+    GameManager.preloader.show();
 
     await this.prepareResources();
 
-    Application.preloader.hide();
+    GameManager.preloader.hide();
   }
 
   async prepareResources() {
-    const gltfLoader = new GLTFLoader(Application.loadingManager);
+    const gltfLoader = new GLTFLoader(GameManager.loadingManager);
     const gltfData = await gltfLoader.loadAsync(cybertruckResource);
     const cybertruckMesh = <THREE.Object3D>gltfData.scene.children[0];
 
-    Application.scene.add(cybertruckMesh);
+    GameManager.scene.add(cybertruckMesh);
   }
 }

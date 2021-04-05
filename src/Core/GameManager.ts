@@ -13,7 +13,7 @@ import World from '../Game/World';
 interface GameManagerConfigInterface {
   containerElement?: HTMLElement;
   canvasElement?: HTMLCanvasElement;
-  sizingElement?: HTMLElement; // The (parent) element we get the canvas width & height from
+  sizingElement?: HTMLElement | Window; // The (parent) element we get the canvas width & height from
   debug?: boolean;
 }
 

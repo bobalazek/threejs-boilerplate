@@ -13,7 +13,7 @@ export default class World {
     this.prepare();
   }
 
-  async prepare() {
+  prepare() {
     GameManager.preloader.show();
 
     this._prepareCameraAndControls();

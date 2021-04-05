@@ -1,15 +1,19 @@
 import * as THREE from 'three';
+import Stats from 'three/examples/jsm/libs/stats.module.js';
 import { WEBGL } from 'three/examples/jsm/WebGL.js';
+import * as dat from 'dat.gui';
 import {
   Emitter,
   createNanoEvents,
 } from 'nanoevents';
 
 import Preloader from './Preloader';
-import World from '../World';
+import World from '../Game/World';
 
 interface GameManagerConfigInterface {
+  containerElement?: HTMLElement;
   canvasElement?: HTMLCanvasElement;
+  sizingElement?: HTMLElement; // The (parent) element we get the canvas width & height from
   debug?: boolean;
 }
 
@@ -22,38 +26,46 @@ export default class GameManager {
   public static config: GameManagerConfigInterface;
   public static parameters: any;
 
+  public static containerElement: HTMLElement;
   public static canvasElement: HTMLCanvasElement;
+  public static sizingElement: HTMLElement | Window;
   public static debug: boolean;
-  public static emitter: Emitter;
   public static preloader: Preloader;
   public static world: World;
 
-  public static width: number;
-  public static height: number;
+  public static stats: Stats;
+  public static datGui: dat.GUI;
+
+  public static canvasWidth: number;
+  public static canvasHeight: number;
   public static requestAnimationFrame: number;
 
+  public static eventsEmitter: Emitter;
   public static loadingManager: THREE.LoadingManager;
   public static renderer: THREE.WebGLRenderer;
-  public static scene: THREE.Scene;
-  public static camera: THREE.PerspectiveCamera;
   public static clock: THREE.Clock;
+  public static scene: THREE.Scene;
+  public static camera: THREE.Camera;
 
   public static boot(config: GameManagerConfigInterface, parameters?: any): GameManager {
     this.config = config;
     this.parameters = parameters;
 
     if (!WEBGL.isWebGLAvailable()) {
-      this.prepareNoWebGLWarning();
+      this._prepareNoWebGLWarning();
 
       return;
     }
 
-    this.canvasElement = this.config.canvasElement;
+    this.containerElement = this.config.containerElement ?? document.body;
+    this.canvasElement = this.config.canvasElement ?? null;
+    this.sizingElement = this.config.sizingElement ?? window;
     this.debug = this.config.debug ?? false;
-    this.emitter = createNanoEvents<GameManagerEvents>();
+
+    this.clock = new THREE.Clock();
+    this.eventsEmitter = createNanoEvents<GameManagerEvents>();
     this.loadingManager = new THREE.LoadingManager();
     this.preloader = new Preloader();
-    this.clock = new THREE.Clock();
 
     let rendererParameters = {
       antialias: true,
@@ -68,7 +80,7 @@ export default class GameManager {
 
     if (!this.canvasElement) {
       this.canvasElement = this.renderer.domElement;
-      document.body.appendChild(this.canvasElement);
+      this.containerElement.appendChild(this.canvasElement);
     }
 
     this.renderer.physicallyCorrectLights = true
@@ -78,32 +90,60 @@ export default class GameManager {
     this.renderer.setClearColor(0xffffff, 1);
 
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera();
+    this.camera = new THREE.Camera();
 
-    this.prepareRendererSize();
+    this._prepareRendererSize();
+
+    if (this.debug) {
+      this._prepareStats();
+      this._prepareDatGui();
+    }
 
     this.world = new World();
 
-    this.onTick();
+    this._onTick();
 
-    window.addEventListener('resize', this.onResize.bind(this));
+    window.addEventListener('resize', this._onResize.bind(this));
 
     return this;
   }
 
-  private static prepareRendererSize() {
-    this.width = window.innerWidth;
-    this.height = window.innerHeight;
+  private static _prepareRendererSize() {
+    let canvasWidth = 0;
+    let canvasHeight = 0;
 
-    if (this.camera) {
-      this.camera.aspect = this.width / this.height;
+    if (this.sizingElement instanceof Window) {
+      canvasWidth = this.sizingElement.innerWidth;
+      canvasHeight = this.sizingElement.innerHeight;
+    } else {
+      const position = this.sizingElement.getBoundingClientRect();
+
+      canvasWidth = position.width;
+      canvasHeight = position.height;
+    }
+
+    this.canvasWidth = canvasWidth;
+    this.canvasHeight = canvasHeight;
+
+    if (this.camera instanceof THREE.PerspectiveCamera) {
+      this.camera.aspect = this.canvasWidth / this.canvasHeight;
       this.camera.updateProjectionMatrix();
     }
 
-    this.renderer.setSize(this.width, this.height);
+    this.renderer.setSize(this.canvasWidth, this.canvasHeight);
   }
 
-  private static prepareNoWebGLWarning() {
+  private static _prepareStats() {
+    this.stats = Stats();
+
+    this.containerElement.appendChild(this.stats.dom);
+  }
+
+  private static _prepareDatGui() {
+    this.datGui = new dat.GUI();
+  }
+
+  private static _prepareNoWebGLWarning() {
     let warningElement = document.createElement('div');
     warningElement.id = 'no-webgl-warning';
     warningElement.style.textAlign = 'center';
@@ -116,28 +156,35 @@ export default class GameManager {
       'Try again with another browser!'
     );
 
-    document.body.prepend(warningElement);
+    this.containerElement.prepend(warningElement);
   }
 
   // Events
-  private static onResize(): void {
-    this.prepareRendererSize();
+  private static _onResize(): void {
+    this._prepareRendererSize();
 
-    this.emitter.emit('resize', {
-      width: this.width,
-      height: this.height,
+    this.eventsEmitter.emit('resize', {
+      width: this.canvasWidth,
+      height: this.canvasHeight,
     });
   }
 
-  private static onTick(): void {
+  private static _onTick(): void {
     const delta = this.clock.getDelta();
 
-    this.emitter.emit('tick', delta);
+    this.eventsEmitter.emit('tick', delta);
 
-    if (this.scene && this.camera) {
+    if (this.stats) {
+      this.stats.update();
+    }
+
+    if (
+      this.scene &&
+      this.camera
+    ) {
       this.renderer.render(this.scene, this.camera);
     }
-    
-    this.requestAnimationFrame = window.requestAnimationFrame(this.onTick.bind(this));
+
+    this.requestAnimationFrame = window.requestAnimationFrame(this._onTick.bind(this));
   }
 }

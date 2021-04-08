@@ -70,7 +70,6 @@ export default class GameManager {
     let rendererParameters = {
       antialias: true,
       powerPreference: 'high-performance',
-      logarithmicDepthBuffer: true,
     };
     if (this.canvasElement) {
       rendererParameters['canvas'] = this.canvasElement;

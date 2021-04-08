@@ -51,16 +51,16 @@ export default class GameManager {
     this.config = config;
     this.parameters = parameters;
 
+    this.containerElement = this.config.containerElement ?? document.body;
+    this.canvasElement = this.config.canvasElement ?? null;
+    this.sizingElement = this.config.sizingElement ?? window;
+    this.debug = this.config.debug ?? false;
+
     if (!WEBGL.isWebGLAvailable()) {
       this._prepareNoWebGLWarning();
 
       return;
     }
-
-    this.containerElement = this.config.containerElement ?? document.body;
-    this.canvasElement = this.config.canvasElement ?? null;
-    this.sizingElement = this.config.sizingElement ?? window;
-    this.debug = this.config.debug ?? false;
 
     this.clock = new THREE.Clock();
     this.eventsEmitter = createNanoEvents<GameManagerEvents>();

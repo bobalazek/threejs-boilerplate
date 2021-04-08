@@ -34,19 +34,19 @@ export default class World {
 
     // Controls
     const controls = new OrbitControls(
-      camera,
+      this.camera,
       GameManager.renderer.domElement
     );
     controls.enableDamping = true;
     controls.minDistance = 4;
     controls.maxDistance = 32;
-    controls.minPolarAngle = THREE.MathUtils.degToRad(0);
-    controls.maxPolarAngle = THREE.MathUtils.degToRad(75);
+    controls.minPolarAngle = THREE.MathUtils.degToRad(10);
+    controls.maxPolarAngle = THREE.MathUtils.degToRad(80);
 
     this.controls = controls;
 
     GameManager.eventsEmitter.on('tick', () => {
-      controls.update();
+      this.controls.update();
     });
   }
 
@@ -56,6 +56,9 @@ export default class World {
     if (GameManager.debug) {
       // Axes
       const axesHelper = new THREE.AxesHelper(16);
+      axesHelper.matrixAutoUpdate = false;
+      axesHelper.updateMatrix();
+
       GameManager.scene.add(axesHelper);
     }
 

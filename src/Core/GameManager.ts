@@ -30,15 +30,12 @@ export default class GameManager {
   public static canvasElement: HTMLCanvasElement;
   public static sizingElement: HTMLElement | Window;
   public static debug: boolean;
+
   public static preloader: Preloader;
   public static world: World;
 
-  public static stats: Stats;
-  public static datGui: dat.GUI;
-
   public static canvasWidth: number;
   public static canvasHeight: number;
-  public static requestAnimationFrame: number;
 
   public static eventsEmitter: Emitter;
   public static loadingManager: THREE.LoadingManager;
@@ -46,6 +43,9 @@ export default class GameManager {
   public static clock: THREE.Clock;
   public static scene: THREE.Scene;
   public static camera: THREE.Camera;
+
+  public static stats: Stats;
+  public static datGui: dat.GUI;
 
   public static boot(config: GameManagerConfigInterface, parameters?: any): GameManager {
     this.config = config;
@@ -116,10 +116,8 @@ export default class GameManager {
       canvasWidth = this.sizingElement.innerWidth;
       canvasHeight = this.sizingElement.innerHeight;
     } else {
-      const position = this.sizingElement.getBoundingClientRect();
-
-      canvasWidth = position.width;
-      canvasHeight = position.height;
+      canvasWidth = this.sizingElement.clientWidth;
+      canvasHeight = this.sizingElement.clientHeight;
     }
 
     this.canvasWidth = canvasWidth;
@@ -178,13 +176,12 @@ export default class GameManager {
       this.stats.update();
     }
 
-    if (
-      this.scene &&
-      this.camera
-    ) {
+    if (this.scene && this.camera) {
       this.renderer.render(this.scene, this.camera);
     }
 
-    this.requestAnimationFrame = window.requestAnimationFrame(this._onTick.bind(this));
+    this.renderer.setAnimationLoop(() => {
+      this._onTick();
+    })
   }
 }

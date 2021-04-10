@@ -57,7 +57,6 @@ export default class World {
       // Axes
       const axesHelper = new THREE.AxesHelper(16);
       axesHelper.matrixAutoUpdate = false;
-      axesHelper.updateMatrix();
 
       GameManager.scene.add(axesHelper);
     }
@@ -70,7 +69,7 @@ export default class World {
 
     const ground = new THREE.Mesh(groundGeometry, groundMaterial);
     ground.rotation.x = THREE.MathUtils.degToRad(-90);
-    ground.receiveShadow = false;
+    ground.receiveShadow = true;
     ground.matrixAutoUpdate = false;
     ground.updateMatrix();
 

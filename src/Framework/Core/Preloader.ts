@@ -1,6 +1,13 @@
-import GameManager from './GameManager';
+import {
+  GameManager,
+} from './GameManager';
 
-export default class Preloader {
+export interface PreloaderInterface {
+  show(): void;
+  hide(): void;
+}
+
+export class Preloader implements PreloaderInterface {
   private containerElement: HTMLElement;
   private textElement: HTMLElement;
   private progressElement: HTMLElement;

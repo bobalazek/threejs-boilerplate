@@ -1,28 +1,22 @@
 import * as THREE from 'three';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
-import { WEBGL } from 'three/examples/jsm/WebGL.js';
+import {
+  WEBGL,
+} from 'three/examples/jsm/WebGL.js';
 import * as dat from 'dat.gui';
 import {
   Emitter,
   createNanoEvents,
 } from 'nanoevents';
 
-import Preloader from './Preloader';
-import World from '../Game/World';
+import {
+  Preloader,
+} from './Preloader';
+import {
+  WorldInterface,
+} from '../Worlds/World';
 
-interface GameManagerConfigInterface {
-  containerElement?: HTMLElement;
-  canvasElement?: HTMLCanvasElement;
-  sizingElement?: HTMLElement | Window; // The (parent) element we get the canvas width & height from
-  debug?: boolean;
-}
-
-interface GameManagerEvents {
-  tick: (delta: number) => void;
-  resize: (data: { width: number, height: number }) => void;
-}
-
-export default class GameManager {
+export class GameManager {
   public static config: GameManagerConfigInterface;
   public static parameters: any;
 
@@ -30,14 +24,14 @@ export default class GameManager {
   public static canvasElement: HTMLCanvasElement;
   public static sizingElement: HTMLElement | Window;
   public static debug: boolean;
-
-  public static preloader: Preloader;
-  public static world: World;
+  public static eventsEmitter: Emitter;
 
   public static canvasWidth: number;
   public static canvasHeight: number;
 
-  public static eventsEmitter: Emitter;
+  public static preloader: Preloader;
+  public static world: WorldInterface;
+
   public static loadingManager: THREE.LoadingManager;
   public static renderer: THREE.WebGLRenderer;
   public static clock: THREE.Clock;
@@ -47,7 +41,7 @@ export default class GameManager {
   public static stats: Stats;
   public static datGui: dat.GUI;
 
-  public static boot(config: GameManagerConfigInterface, parameters?: any): GameManager {
+  public static boot(config: GameManagerConfigInterface, parameters?: any) {
     this.config = config;
     this.parameters = parameters;
 
@@ -67,9 +61,13 @@ export default class GameManager {
     this.loadingManager = new THREE.LoadingManager();
     this.preloader = new Preloader();
 
-    let rendererParameters = {
+    const defaultRendererParameters = {
       antialias: true,
       powerPreference: 'high-performance',
+    };
+    let rendererParameters = {
+      ...defaultRendererParameters,
+      ...this.config.rendererParameters,
     };
     if (this.canvasElement) {
       rendererParameters['canvas'] = this.canvasElement;
@@ -98,13 +96,14 @@ export default class GameManager {
       this._prepareDatGui();
     }
 
-    this.world = new World();
+    this.world = new this.config.defaultWorld();
+    this.world.start();
+    this.world.load().then(() => {
+      this._onTick();
+    });
 
-    this._onTick();
-
+    // Events
     window.addEventListener('resize', this._onResize.bind(this));
-
-    return this;
   }
 
   private static _prepareRendererSize() {
@@ -122,8 +121,12 @@ export default class GameManager {
     this.canvasWidth = canvasWidth;
     this.canvasHeight = canvasHeight;
 
+    const aspect = this.canvasWidth / this.canvasHeight;
+
     if (this.camera instanceof THREE.PerspectiveCamera) {
-      this.camera.aspect = this.canvasWidth / this.canvasHeight;
+      this.camera.aspect = aspect;
+      this.camera.updateProjectionMatrix();
+    } else if (this.camera instanceof THREE.OrthographicCamera) {
       this.camera.updateProjectionMatrix();
     }
 
@@ -164,6 +167,8 @@ export default class GameManager {
       width: this.canvasWidth,
       height: this.canvasHeight,
     });
+
+    this._render();
   }
 
   private static _onTick(): void {
@@ -175,12 +180,30 @@ export default class GameManager {
       this.stats.update();
     }
 
+    this.world.update();
+
+    this._render();
+
+    this.renderer.setAnimationLoop(this._onTick.bind(this));
+  }
+
+  private static _render() {
     if (this.scene && this.camera) {
       this.renderer.render(this.scene, this.camera);
     }
-
-    this.renderer.setAnimationLoop(() => {
-      this._onTick();
-    })
   }
+}
+
+export interface GameManagerConfigInterface {
+  defaultWorld: new () => WorldInterface;
+  containerElement?: HTMLElement;
+  canvasElement?: HTMLCanvasElement;
+  sizingElement?: HTMLElement | Window; // The (parent) element we get the canvas width & height from
+  debug?: boolean;
+  rendererParameters?: THREE.WebGLRendererParameters;
+}
+
+export interface GameManagerEvents {
+  tick: (delta: number) => void;
+  resize: (data: { width: number, height: number }) => void;
 }

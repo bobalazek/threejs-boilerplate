@@ -36,15 +36,29 @@ All our actual game logic goes in here. Of course, you will need to split it int
 Here you'll normally smash your styles, models, textures, shaders and other static resources into.
 
 
+## Model/texture usage
+
+```javascript
+import {
+  GLTFLoader,
+} from 'three/examples/jsm/loaders/GLTFLoader.js';
+
+import vehicleModelUrl from '../../Resources/models/vehicle.glb';
+import vehicleModelTexture from '../../Resources/texture/vehicle.png';
+
+this.gltfLoader = new GLTFLoader(GameManager.loadingManager);
+this.gltfLoader.load(vehicleModelUrl, (gltf) => {
+  console.log('Yay, model loaded!');
+});
+
+const vehicleTexture = new THREE.TextureLoader().load(vehicleModelTexture);
+```
 ## Shader usage
 
-In in the head of your file just add:
 ```javascript
 import defaultFragmentShader from '../../Resources/shaders/default.fragment.fx';
 import defaultVertexShader from '../../Resources/shaders/default.vertex.fx';
-```
-This will then return the contents of that will as a string, which you can then use as:
-```javascript
+
 const shaderMaterial = new THREE.ShaderMaterial({
   fragmentShader: defaultFragmentShader,
   vertextShader: defaultVertexShader,

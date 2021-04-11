@@ -30,7 +30,7 @@ module.exports = {
         ],
       },
       {
-        test: /\.(jpg|png|gif|glb|gltf)$/i,
+        test: /\.(jpg|png|gif|env|dds|hdr|glb|gltf)$/i,
         use: [
           {
             loader: 'url-loader',

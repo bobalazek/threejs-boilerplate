@@ -3,3 +3,4 @@ declare module '*.png';
 declare module '*.gif';
 declare module '*.glb';
 declare module '*.gltf';
+declare module '*.fx';

@@ -41,6 +41,14 @@ module.exports = {
           },
         ],
       },
+      {
+        test: /\.fx/i,
+        use: [
+          {
+            loader: 'raw-loader',
+          },
+        ],
+      },
     ],
   },
   resolve: {

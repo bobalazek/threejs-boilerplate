@@ -69,8 +69,10 @@ module.exports = {
           from: './public',
           to: './',
           globOptions: {
+            dot: true,
+            gitignore: true,
             ignore: [
-              '*.html', // already handled by HtmlWebpackPlugin above
+              '**/*.html', // already handled by HtmlWebpackPlugin above
             ],
           },
         },

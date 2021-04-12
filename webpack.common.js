@@ -70,7 +70,7 @@ module.exports = {
           to: './',
           globOptions: {
             ignore: [
-              '**/*index.html', // already handled by HtmlWebpackPlugin above
+              '*.html', // already handled by HtmlWebpackPlugin above
             ],
           },
         },

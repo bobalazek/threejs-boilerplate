@@ -3,7 +3,7 @@
     "start": "webpack serve --open --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js --progress"
   },
-  "devDependencies": {
+  "dependencies": {
     "@types/dat.gui": "^0.7.6",
     "@types/three": "^0.127.0",
     "clean-webpack-plugin": "^3.0.0",

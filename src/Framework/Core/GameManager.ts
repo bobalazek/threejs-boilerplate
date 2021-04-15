@@ -97,10 +97,8 @@ export class GameManager {
     }
 
     this.world = new this.config.defaultWorld();
-    this.world.start();
-    this.world.load().then(() => {
-      this._onTick();
-    });
+
+    this.setWorld(this.world);
 
     // Events
     window.addEventListener('resize', this._onResize.bind(this));
@@ -131,6 +129,22 @@ export class GameManager {
     }
 
     this.renderer.setSize(this.canvasWidth, this.canvasHeight);
+  }
+
+  public static setWorld(world: WorldInterface): Promise<GameManager> {
+    this.world = world;
+
+    this.world.start();
+
+    return new Promise((resolve) => {
+      this.world.load().then((loadedWorld: WorldInterface) => {
+        this.scene = loadedWorld.scene;
+
+        this._onTick();
+
+        resolve(this);
+      });
+    });
   }
 
   private static _prepareStats() {

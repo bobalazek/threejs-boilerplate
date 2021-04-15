@@ -10,6 +10,7 @@ import {
   GameManager,
 } from '../../Framework/Core/GameManager';
 import {
+  WorldInterface,
   AbstractWorld,
 } from '../../Framework/Worlds/World';
 
@@ -19,13 +20,15 @@ export class DefaultWorld extends AbstractWorld {
   private gltfLoader: GLTFLoader;
 
   start() {
+    super.start();
+
     GameManager.preloader.show();
 
     this._prepareCameraAndControls();
     this._prepareEnvironment();
   }
 
-  load(): Promise<DefaultWorld> {
+  load(): Promise<WorldInterface> {
     return new Promise((resolve) => {
       // Here you'd probably load some model/texture resources
 
@@ -72,13 +75,13 @@ export class DefaultWorld extends AbstractWorld {
       // Grid Helper
       const gridHelper = new THREE.GridHelper(helperSize, helperSize / 8, 0xcccccc, 0x333333);
 
-      GameManager.scene.add(gridHelper);
+      this.scene.add(gridHelper);
 
       // Axes Helper
       const axesHelper = new THREE.AxesHelper(helperSize);
       axesHelper.position.y = 0.01; // Just so we are on the top of the grid helper
 
-      GameManager.scene.add(axesHelper);
+      this.scene.add(axesHelper);
     }
   }
 }

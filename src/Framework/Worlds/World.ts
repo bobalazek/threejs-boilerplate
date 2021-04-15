@@ -11,10 +11,10 @@ export abstract class AbstractWorld implements WorldInterface {
   public scene: THREE.Scene;
 
   start() {
-    // Your start logic here
+    this.scene = new THREE.Scene();
   }
 
-  load(): Promise<AbstractWorld> {
+  load(): Promise<WorldInterface> {
     return new Promise((resolve) => {
       // Your load logic here
 
